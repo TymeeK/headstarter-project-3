@@ -16,10 +16,11 @@ export async function POST(req){
     console.log('data.body:' + data.message)
 
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY)
+    const prompt = `${systemPrompt}\nUser: ${data.message}\nAssistant:`;
 
     try{
         const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash"});
-        const result = await model.generateContent(data.message);
+        const result = await model.generateContent(prompt);
         const response = await result.response;
         const content = await response.text()
         console.log('content: ', content)
