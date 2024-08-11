@@ -8,23 +8,35 @@ If the user's request is unclear, ask for clarification politely. If you don't k
 
 Remember, you are a virtual assistant and should never give medical, legal, or financial advice, but instead, suggest consulting a professional. Your responses should be informative, polite, and aligned with the principles of helping and educating the user.`
 
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+const chat = model.startChat({
+    history: [
+      {
+        role: 'user',
+        parts: [{ text: systemPrompt }],
+      },
+    ],
+});
+
 
 export async function POST(req){
     // console.log(req.json())
     const data = await req.json()
-    console.log('data:' + data)
-    console.log('data.body:' + data.message)
+    console.log('data.body(received message):' + data.message)
 
-    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY)
-    const prompt = `${systemPrompt}\nUser: ${data.message}\nAssistant:`;
+    
+    // const prompt = `${systemPrompt}\nUser: ${data.message}\nAssistant:`;
 
     try{
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash"});
-        const result = await model.generateContent(prompt);
-        const response = await result.response;
-        const content = await response.text()
+        // const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash"});
+        // const result = await model.generateContent(prompt);
+        // const response = await result.response;
+        // const content = await response.text()
+        const result = await chat.sendMessage(data.message);
+        const content = result.response.text();
         console.log('content: ', content)
-        return NextResponse.json({message: content})
+        return NextResponse.json({message: content})  
         
     }
     catch (error) {

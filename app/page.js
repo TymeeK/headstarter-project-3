@@ -13,10 +13,17 @@ export default function Home() {
   const [message, setMessage] = useState('')
 
   const sendMessage = async () => {
-    // We'll implement this function in the next section
+    setMessage('');
 
     const userMessage = { role: 'user', content: message };
-    setMessages([...messages, userMessage]); //append new message to messages
+    // setMessages([...messages, userMessage]); //append new message to messages
+
+    // Add user's message to the chat
+    setMessages((prevMessages) => [
+      ...prevMessages,
+      { role: 'user', content: message },
+      { role: 'assistant', content: '' }, // Placeholder for assistant's response
+    ]);
 
     try {
       const response = await fetch('/api/chat', {
@@ -24,13 +31,24 @@ export default function Home() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ message }),
+        body: JSON.stringify({message}),
       });
 
       const data = await response.json();
-      const assistantMessage = { role: 'assistant', content: data.message };
+      // const assistantMessage = { role: 'assistant', content: data.message };
 
-      setMessages((prevMessages) => [...prevMessages, assistantMessage]);
+      // setMessages((prevMessages) => [...prevMessages, assistantMessage]);
+      // Update messages with the assistant's response
+      setMessages((prevMessages) => {
+        // Replace the placeholder with the actual response
+        const updatedMessages = [...prevMessages];
+        const lastMessage = updatedMessages.pop();
+        return [
+          ...updatedMessages,
+          { ...lastMessage, content: data.message },
+        ];
+      });
+      // console.log(messages)
     } catch (error) {
       console.error('Error sending message:', error);
       setMessages((prevMessages) => [
@@ -41,6 +59,7 @@ export default function Home() {
       setMessage('');
     }
   }
+  console.log(messages)
 
   return (
     <Box
