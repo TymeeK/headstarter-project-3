@@ -33,22 +33,48 @@ export default function Home() {
         },
         body: JSON.stringify({message}),
       });
-
-      const data = await response.json();
+      // 1.single-turn chat(no context)
       // const assistantMessage = { role: 'assistant', content: data.message };
 
       // setMessages((prevMessages) => [...prevMessages, assistantMessage]);
       // Update messages with the assistant's response
-      setMessages((prevMessages) => {
-        // Replace the placeholder with the actual response
-        const updatedMessages = [...prevMessages];
-        const lastMessage = updatedMessages.pop();
-        return [
-          ...updatedMessages,
-          { ...lastMessage, content: data.message },
-        ];
-      });
+
+      // 2.multi-turn chat(with context) without streaming
+      //const data = await response.json();
+
+      // setMessages((prevMessages) => {
+      //   // Replace the placeholder with the actual response
+      //   const updatedMessages = [...prevMessages];
+      //   const lastMessage = updatedMessages.pop();
+      //   return [
+      //     ...updatedMessages,
+      //     { ...lastMessage, content: data.message },
+      //   ];
+      // });
       // console.log(messages)
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let assistantMessage = '';
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        // Decode the chunk and append to the assistant message
+        assistantMessage += decoder.decode(value, { stream: true });
+
+        // Update the assistant message in the chat
+        setMessages((prevMessages) => {
+          const updatedMessages = [...prevMessages];
+          const lastMessage = updatedMessages.pop(); // Get the placeholder
+          return [
+            ...updatedMessages,
+            { ...lastMessage, content: assistantMessage },
+          ];
+        });
+      }
+
     } catch (error) {
       console.error('Error sending message:', error);
       setMessages((prevMessages) => [

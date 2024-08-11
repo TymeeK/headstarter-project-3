@@ -29,14 +29,36 @@ export async function POST(req){
     // const prompt = `${systemPrompt}\nUser: ${data.message}\nAssistant:`;
 
     try{
+        // 1.single-turn chat(no context)
         // const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash"});
         // const result = await model.generateContent(prompt);
         // const response = await result.response;
         // const content = await response.text()
-        const result = await chat.sendMessage(data.message);
-        const content = result.response.text();
-        console.log('content: ', content)
-        return NextResponse.json({message: content})  
+
+        // 2.multi-turn chat(with context) without streaming
+        // const result = await chat.sendMessage(data.message);
+        // const content = result.response.text();
+        // console.log('content: ', content)
+        // return NextResponse.json({message: content})  
+        
+        // 3.mult-turn chat(with context) with streaming(use Gemini's sendMessageStream along with javascript's ReadableStream)
+        const result = await chat.sendMessageStream(data.message)
+        const readableStream = new ReadableStream({
+          async start(controller) {
+              for await (const chunk of result.stream) {
+                  const chunkText = await chunk.text(); // Convert chunk to text
+                  console.log('Chunk received:', chunkText);
+                  controller.enqueue(chunkText); // Send chunk to the client
+              }
+              controller.close(); // Close the stream when done
+          }
+      });
+
+      return new NextResponse(readableStream, {
+        headers: { 'Content-Type': 'text/plain' }, // Ensure correct content type
+      });
+
+
         
     }
     catch (error) {
@@ -44,6 +66,7 @@ export async function POST(req){
         return NextResponse.json({ message: "Sorry, something went wrong." });
     }
 
+    // 3. openai(not free)
     // const openai = new OpenAI()
     // const completion = await openai.chat.completions.create({
     //     model : "gpt-3.5-turbo",
