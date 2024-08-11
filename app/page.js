@@ -53,6 +53,7 @@ export default function Home() {
       // });
       // console.log(messages)
 
+      // 3.mult-turn chat(with context) with streaming(use Gemini's sendMessageStream along with javascript's ReadableStream)
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
       let assistantMessage = '';
@@ -62,7 +63,7 @@ export default function Home() {
         if (done) break;
 
         // Decode the chunk and append to the assistant message
-        assistantMessage += decoder.decode(value, { stream: true });
+        assistantMessage += decoder.decode(value, { stream: true }); //convert chunks of bytes to text
 
         // Update the assistant message in the chat
         setMessages((prevMessages) => {
@@ -128,6 +129,7 @@ export default function Home() {
                 color="white"
                 borderRadius={16}
                 p={3}
+                style={{ whiteSpace: 'pre-wrap' }}
               >
                 {message.content}
               </Box>
