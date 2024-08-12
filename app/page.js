@@ -1,6 +1,6 @@
 'use client'
 
-import { Box, Button, Stack, TextField } from '@mui/material'
+import { Avatar, Box, Button, Stack, TextField } from '@mui/material'
 import { useState, useRef, useEffect } from 'react'
 
 export default function Home() {
@@ -131,6 +131,7 @@ export default function Home() {
         width='500px'
         height='700px'
         border='1px solid black'
+        borderRadius={10}
         p={2}
         spacing={3}
       >
@@ -149,6 +150,22 @@ export default function Home() {
                 message.role === 'assistant' ? 'flex-start' : 'flex-end'
               }
             >
+              {message.role === 'assistant' && (
+                <Box
+                  display={'flex'}
+                  justifyContent={'center'}
+                  alignItems={'center'}
+                  mr={1}
+                >
+                  <Avatar
+                    sx={{
+                      bgcolor: 'gray',
+                    }}
+                  >
+                    AI
+                  </Avatar>
+                </Box>
+              )}
               <Box
                 bgcolor={
                   message.role === 'assistant'
@@ -162,6 +179,22 @@ export default function Home() {
               >
                 {message.content}
               </Box>
+              {message.role === 'user' && (
+                <Box
+                  display={'flex'}
+                  justifyContent={'center'}
+                  alignItems={'center'}
+                  ml={1}
+                >
+                  <Avatar
+                    sx={{
+                      bgcolor: 'gray',
+                    }}
+                  >
+                    U
+                  </Avatar>
+                </Box>
+              )}
             </Box>
           ))}
           <div ref={messagesEndRef} />
