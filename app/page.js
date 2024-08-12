@@ -2,6 +2,7 @@
 
 import { Avatar, Box, Button, Stack, TextField } from '@mui/material'
 import { useState, useRef, useEffect } from 'react'
+import Markdown from 'react-markdown'
 
 export default function Home() {
   const [messages, setMessages] = useState([
@@ -128,9 +129,9 @@ export default function Home() {
     >
       <Stack
         direction={'column'}
-        width='500px'
-        height='700px'
-        border='1px solid black'
+        width='100vh'
+        height='100vh'
+        // border='1px solid black'
         borderRadius={10}
         p={2}
         spacing={3}
@@ -157,13 +158,7 @@ export default function Home() {
                   alignItems={'center'}
                   mr={1}
                 >
-                  <Avatar
-                    sx={{
-                      bgcolor: 'gray',
-                    }}
-                  >
-                    AI
-                  </Avatar>
+                  <Avatar>AI</Avatar>
                 </Box>
               )}
               <Box
@@ -177,7 +172,7 @@ export default function Home() {
                 p={3}
                 style={{ whiteSpace: 'pre-wrap' }}
               >
-                {message.content}
+                <Markdown>{message.content}</Markdown>
               </Box>
               {message.role === 'user' && (
                 <Box
@@ -186,13 +181,7 @@ export default function Home() {
                   alignItems={'center'}
                   ml={1}
                 >
-                  <Avatar
-                    sx={{
-                      bgcolor: 'gray',
-                    }}
-                  >
-                    U
-                  </Avatar>
+                  <Avatar>U</Avatar>
                 </Box>
               )}
             </Box>
