@@ -7,7 +7,8 @@ export default function Home() {
   const [messages, setMessages] = useState([
     {
       role: 'assistant',
-      content: "Hi! I'm the Headstarter support assistant. How can I help you today?",
+      content:
+        "Hi! I'm the Headstarter support assistant. How can I help you today?",
     },
   ])
   const [message, setMessage] = useState('')
@@ -17,7 +18,7 @@ export default function Home() {
 
   //auto-scrolling
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }
 
   useEffect(() => {
@@ -26,19 +27,19 @@ export default function Home() {
   //auto-scrolling
 
   const sendMessage = async () => {
-    if (!message.trim() || isLoading) return;
+    if (!message.trim() || isLoading) return
     setIsLoading(true)
-    setMessage('');
+    setMessage('')
 
-    const userMessage = { role: 'user', content: message };
+    const userMessage = { role: 'user', content: message }
     // setMessages([...messages, userMessage]); //append new message to messages
 
     // Add user's message to the chat
-    setMessages((prevMessages) => [
+    setMessages(prevMessages => [
       ...prevMessages,
       { role: 'user', content: message },
       { role: 'assistant', content: '' }, // Placeholder for assistant's response
-    ]);
+    ])
 
     try {
       const response = await fetch('/api/chat', {
@@ -46,8 +47,8 @@ export default function Home() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({message}),
-      });
+        body: JSON.stringify({ message }),
+      })
       // 1.single-turn chat(no context)
       // const assistantMessage = { role: 'assistant', content: data.message };
 
@@ -69,42 +70,47 @@ export default function Home() {
       // console.log(messages)
 
       // 3.mult-turn chat(with context) with streaming(use Gemini's sendMessageStream along with javascript's ReadableStream)
-      const reader = response.body.getReader();
-      const decoder = new TextDecoder();
-      let assistantMessage = '';
+      const reader = response.body.getReader()
+      const decoder = new TextDecoder()
+      let assistantMessage = ''
 
       while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
+        const { done, value } = await reader.read()
+        if (done) break
 
         // Decode the chunk and append to the assistant message
-        assistantMessage += decoder.decode(value, { stream: true }); //convert chunks of bytes to text
+        assistantMessage += decoder.decode(value, { stream: true }) //convert chunks of bytes to text
 
         // Update the assistant message in the chat
-        setMessages((prevMessages) => {
-          const updatedMessages = [...prevMessages];
-          const lastMessage = updatedMessages.pop(); // Get the placeholder
+        setMessages(prevMessages => {
+          const updatedMessages = [...prevMessages]
+          const lastMessage = updatedMessages.pop() // Get the placeholder
+          const aiMessage = JSON.parse(assistantMessage)
           return [
             ...updatedMessages,
-            { ...lastMessage, content: assistantMessage },
-          ];
-        });
+            {
+              ...lastMessage,
+              content: aiMessage.message
+                ? JSON.stringify(aiMessage.message)
+                : assistantMessage,
+            },
+          ]
+        })
       }
-
     } catch (error) {
-      console.error('Error sending message:', error);
-      setMessages((prevMessages) => [
+      console.error('Error sending message:', error)
+      setMessages(prevMessages => [
         ...prevMessages,
         { role: 'assistant', content: 'Sorry, something went wrong.' },
-      ]);
+      ])
     } finally {
-      setMessage('');
+      setMessage('')
     }
     setIsLoading(false)
   }
   console.log(messages)
 
-  const handleKeyPress = (event) => {
+  const handleKeyPress = event => {
     if (event.key === 'Enter' && !event.shiftKey) {
       event.preventDefault()
       sendMessage()
@@ -113,18 +119,18 @@ export default function Home() {
 
   return (
     <Box
-      width="100vw"
-      height="100vh"
-      display="flex"
-      flexDirection="column"
-      justifyContent="center"
-      alignItems="center"
+      width='100vw'
+      height='100vh'
+      display='flex'
+      flexDirection='column'
+      justifyContent='center'
+      alignItems='center'
     >
       <Stack
         direction={'column'}
-        width="500px"
-        height="700px"
-        border="1px solid black"
+        width='500px'
+        height='700px'
+        border='1px solid black'
         p={2}
         spacing={3}
       >
@@ -132,13 +138,13 @@ export default function Home() {
           direction={'column'}
           spacing={2}
           flexGrow={1}
-          overflow="auto"
-          maxHeight="100%"
+          overflow='auto'
+          maxHeight='100%'
         >
           {messages.map((message, index) => (
             <Box
               key={index}
-              display="flex"
+              display='flex'
               justifyContent={
                 message.role === 'assistant' ? 'flex-start' : 'flex-end'
               }
@@ -149,7 +155,7 @@ export default function Home() {
                     ? 'primary.main'
                     : 'secondary.main'
                 }
-                color="white"
+                color='white'
                 borderRadius={16}
                 p={3}
                 style={{ whiteSpace: 'pre-wrap' }}
@@ -162,15 +168,15 @@ export default function Home() {
         </Stack>
         <Stack direction={'row'} spacing={2}>
           <TextField
-            label="Message"
+            label='Message'
             fullWidth
             value={message}
-            onChange={(e) => setMessage(e.target.value)}
+            onChange={e => setMessage(e.target.value)}
             onKeyPress={handleKeyPress}
             disabled={isLoading}
           />
-          <Button 
-            variant="contained" 
+          <Button
+            variant='contained'
             onClick={sendMessage}
             disabled={isLoading}
           >
