@@ -85,13 +85,13 @@ export default function Home() {
         setMessages(prevMessages => {
           const updatedMessages = [...prevMessages]
           const lastMessage = updatedMessages.pop() // Get the placeholder
-          const aiMessage = JSON.parse(assistantMessage)
+
           return [
             ...updatedMessages,
             {
               ...lastMessage,
-              content: aiMessage.message
-                ? JSON.stringify(aiMessage.message)
+              content: assistantMessage.message
+                ? JSON.stringify(JSON.parse(assistantMessage.message))
                 : assistantMessage,
             },
           ]
